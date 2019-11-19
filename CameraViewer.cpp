@@ -33,7 +33,7 @@ void					popup(std::string message, HWND parent = NULL);
 HWND g_hWnd;
 
 
-int ShowVideo();
+int ShowVideo(int);
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -147,18 +147,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	// they remains in memory until the end of the program.
 	static HWND viewCamBtn;
 
-    switch (message)
+	static HWND comPort;
+	switch (message)
     {
 		case WM_CREATE:
 			{
 				// buttons
-				viewCamBtn = CreateWindow(L"BUTTON", L"Play", BS_TEXT | WS_CHILD | WS_VISIBLE,
-					0, 0, 50, 20, hWnd, (HMENU)2, (HINSTANCE)GetWindowLongPtr(hWnd, -6)/*hInst*/, NULL);
+				viewCamBtn = CreateWindow(L"BUTTON", L"PlayVid1", BS_TEXT | WS_CHILD | WS_VISIBLE,
+					0, 0, 100, 20, hWnd, (HMENU)2, (HINSTANCE)GetWindowLongPtr(hWnd, -6)/*hInst*/, NULL);
 
 				if (!viewCamBtn)
 				{
 					return FALSE;
 				}
+
+				comPort = CreateWindow(L"BUTTON", L"PlayVid2", WS_CHILD | WS_VISIBLE | BS_TEXT,
+					0,20, 100, 20, hWnd, (HMENU)3, (HINSTANCE)GetWindowLongPtr(hWnd, -6), NULL);
 
 
 			}
@@ -175,9 +179,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					DestroyWindow(hWnd);
 					break;
 				case 2:
-					ShowVideo();
+					ShowVideo(0);
 					//DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 					break;
+				case 3:
+					ShowVideo(1);
+					//DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					break;
+
 
 				default:
 					return DefWindowProc(hWnd, message, wParam, lParam);
@@ -238,7 +247,7 @@ void popup(std::string message, HWND parent )
 	MessageBox(parent, (LPCTSTR)lpDisplayBuf, TEXT("output"), MB_OK);
 }
 
-int ShowVideo()
+int ShowVideo(int cameraIndex = 1)
 {
 	int key(0);
 	cv::Mat img;
@@ -247,7 +256,7 @@ int ShowVideo()
 
 	//cv::namedWindow("Original", cv::WINDOW_AUTOSIZE);
 	//cv::namedWindow("Filtered", cv::WINDOW_AUTOSIZE);
-	cv::VideoCapture cap(1 + cv::CAP_DSHOW);
+	cv::VideoCapture cap(cameraIndex + cv::CAP_DSHOW);
 
 	//HWND hWnd2 = (HWND)cvGetWindowHandle("Original");
 	//HWND hWnd3 = (HWND)cvGetWindowHandle("Filtered");
